@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include "chkops.h"
 /*
 
 Six powerfull functions to get random numbers, see the menu() function bellow to learn how to use each of them...
@@ -21,64 +22,88 @@ long int randomInt(long int min, long int max);
 long double randomFloat(long double min, long double max);
 char *randomStringInteger(unsigned long long digits, unsigned int firstDigitAbove, unsigned int firstDigitBellow);
 char *randomStringFloat(unsigned long long digits, unsigned long long DecDigits, unsigned int firstDigitAbove, unsigned int firstDigitBellow);
-void menu(char *argv[]);
+int menu(char *argv[]);
 
 int main(int argc, char * argv[])
 {	
-	menu(argv);
+	if(menu(argv) == -1 || argc < 4)
+	{
+		printf("Thre could be some data missing or missformatted in: %s\n", argv[0]);
+		exit(EXIT_SUCCESS);
+	}
 	return EXIT_SUCCESS;
 }
 
-void menu(char *argv[])
+int menu(char *argv[])
 {
 	char opc[1], *randomStr;
 	opc[0] = argv[1][1];
+
 	long int *randomArray, randomI;
 	long double *randomDoubles, randomF;
+
+	if(argv[1][0] != '-')
+		return -1;
 
 	switch(opc[0])
 	{
 		case 'A':// -A [amount_of_random_integers] [maximum_value_for_each_integer] [minimum_value_for_each_integer] (e.g. -A 10 35 80)
-			
-			randomArray = randomIntegers( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ) );
-			for(unsigned long long index = 0; index < atoi( argv[2] ); index++)
-				printf("%li,", randomArray[index]);
-			//...
-			free(randomArray);
+			if( isUnsignedInteger(argv[2]) && isUnsignedInteger(argv[3]) && isUnsignedInteger(argv[4]) )
+			{	
+				randomArray = randomIntegers( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ) );
+				for(unsigned long long index = 0; index < atoi( argv[2] ); index++)
+					printf("%li,", randomArray[index]);
+				//...
+				free(randomArray);
+			}
 		break;
 
 		case 'a':// -a [amount_of_random_floats] [maximum_value_for_each_float] [minimum_value_for_each_float] (e.g. -a 10 -35.77 35.96)
-		
-			randomDoubles = randomFloats( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ) );
-			for(unsigned long long index = 0; index < atoi( argv[2] ); index++)
-				printf("%LG,", randomDoubles[index]);
-			//...
-			free(randomDoubles);
+			if( isUnsignedInteger(argv[2]) && isSignedFloat(argv[3]) && isSignedFloat(argv[4]) )
+			{
+				randomDoubles = randomFloats( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ) );
+				for(unsigned long long index = 0; index < atoi( argv[2] ); index++)
+					printf("%LG,", randomDoubles[index]);
+				//...
+				free(randomDoubles);
+			}
 
 		break;
 
 		case 'i':// -i [maximum_value_for_each_integer] [minimum_value_for_each_integer] (e.g. -i -35 -5)
-			randomI = randomInt( atoi( argv[2] ), atoi( argv[3] ) );
-			printf("%li\n", randomI);
+			if( isUnsignedInteger(argv[2]) && isUnsignedInteger(argv[3]) )
+			{
+				randomI = randomInt( atoi( argv[2] ), atoi( argv[3] ) );
+				printf("%li\n", randomI);
+			}
 		break;
 		
 		case 'f':// -f [maximum_value_for_each_float] [minimum_value_for_each_float] (e.g. -f -35.87 -5.87)
-			randomF = randomFloat( atoi( argv[2] ), atoi( argv[3] ) );
-			printf("%LG\n", randomF);
+			if( isSignedFloat(argv[2]) && isSignedFloat(argv[3]) )
+			{
+				randomF = randomFloat( atoi( argv[2] ), atoi( argv[3] ) );
+				printf("%LG\n", randomF);
+			}
 		break;
 
 		case 'S':// -S [amount_of_digits] [maximum_value_for_first_digit] [minimum_value_for_first_digit] (e.g. -S 35 5 9)
-			randomStr = randomStringInteger( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ) );
-			printf("%s\n", randomStr);
+			if( isUnsignedInteger(argv[2]) && isUnsignedInteger(argv[3]) && isUnsignedInteger(argv[4]) )
+			{
+				randomStr = randomStringInteger( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ) );
+				printf("%s\n", randomStr);
+			}
 		break;
 
 		case 's':/* -s [amount_of_digits_you_want_for_whole_part] [amount_of_digits_you_want_for_decimal_part]  [maximum_value_for_first_digit] [minimum_value_for_first_digit] (e.g. -s 50 50 3 8)*/
-			randomStr = randomStringFloat( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ), atoi( argv[5] ) );
-			printf("%s\n", randomStr);
+			if( isUnsignedInteger(argv[2]) && isUnsignedInteger(argv[3]) && isUnsignedInteger(argv[4]) && isUnsignedInteger(argv[5]))
+			{
+				randomStr = randomStringFloat( atoi( argv[2] ), atoi( argv[3] ), atoi( argv[4] ), atoi( argv[5] ) );
+				printf("%s\n", randomStr);
+			}
 		break;
 
 	};
-	return;
+	return -1;
 	
 }
 
